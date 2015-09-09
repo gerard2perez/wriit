@@ -1,0 +1,96 @@
+.wriit-box .itextarea-cords {
+	padding: 4px 8px;
+	border-radius: 2px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+	background-color: white;
+	width: auto;
+    display: inline-block;
+}
+
+.wriit-box menu {
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	margin: 0px;
+	padding: 0px;
+	font-size: 12px;
+}
+
+.wriit-box menu>button {
+	transition: all 200ms;
+	height: 35px;
+	width: 35px;
+	background-color: white;
+	font-weight: 550;
+	border: none;
+	cursor: pointer;
+	outline: none;
+	position: relative;
+}
+
+.wriit-box menu>button.active {
+	background-color: rgba(210, 105, 30, 0.5);
+	color: white;
+}
+
+.wriit-box menu>button:hover,
+.wriit-box menu>button.active:hover {
+	background-color: rgba(210, 105, 30, 1);
+	color: white;
+}
+.wriit-box menu>button[disabled]{
+	background-color:inherit;
+	color: graytext;
+}
+.wriit-box menu>button>span {
+	background-color: black;
+	color: white;
+	padding: 4px 8px;
+	border-radius: 2px;
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	height: 0px;
+	overflow: hidden;
+	opacity: 0;
+	transition: all 0.1s ease-out;
+	box-sizing: border-box;
+	min-width: 100%;
+	left: -2px;
+}
+
+.wriit-box menu>button:hover>span {
+	height: 20px;
+	bottom: -20px;
+	opacity: 1;
+	display: inline-table;
+	z-index: 100;
+}
+
+.wriit-box menu>button[disabled]:hover>span{
+	background-color:graytext;
+	color: white;
+}
+[data-wriit-role=text-area] {
+	outline: none;
+	padding:5px 0px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	border-top: none;
+}
+.wriit-box .tagi{
+	background-color: white;
+    margin-top: 2px;
+}
+.wriit-box .tagi>*{
+	display: inline-block;
+    min-width: 20px;
+    height: 20px;
+    background-color: white;
+    width: auto;
+    font-size: 15px;
+    text-align: center;
+    padding: 2px 5px;
+    border: 1px solid #EEE;
+    margin-right: -1px;
+    cursor: default;
+    font-weight: bolder;
+    color: #CCC;
+}
