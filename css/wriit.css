@@ -94,3 +94,18 @@
     font-weight: bolder;
     color: #CCC;
 }
+
+.text-right{
+	text-align: right;
+}
+
+.text-center{
+	text-align: center;
+}
+
+.text-left{
+	text-align: left;
+}
+.text-center{
+	text-align: center;
+}
