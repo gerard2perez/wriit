@@ -4,6 +4,7 @@ import {Single,StyleTag,StyleAttr} from './wriit-tags';
 import Toolbar from './wriit-toolbar';
 import iTextArea from './iTextArea';
 import KeyHandler from './keyhandler';
+import * as modules from './modules';
 
 var GPEGui = {
 	engine: {
@@ -89,19 +90,7 @@ var _hl = '<li id="hr" name="hr" value="21"></li>';
 var _unformat = '<li id="unformart" value="0"></li>';
 
 var template = '<section class="wriit-box"><menu></menu><div data-wriit-role="text-area"></div><div class="tagi"></div></section>';
-var installedplugins = [
-	'bold',
-//	'pasteEvent',
-//	'italic',
-//	'underline',
-//	'strikethrough',
-//	'pown',
-//	'subindex',
-//	'undo',
-//	'redo',
-//	'paragraph',
-//	'forecolor'
-];
+let installedplugins = [];
 
 function getTag(node, tags) {
 	for (let prop in tags) {
@@ -199,7 +188,6 @@ function NodeAnalysis(tags, maincontainer) {
 		let doo=tag.Mime;
 		if (glow && doo) {
 			button.style["box-shadow"] = "inset #00ff00 1px 1px 50px";
-
 		} else {
 			button.style["box-shadow"] = "";
 		}
@@ -406,7 +394,12 @@ function Wriit(parent, cfg) {
 		return that.buttons[id];
 	};
 }
-Wriit.prototype.pasteEvent = {
+
+for(let mod in modules){
+	installedplugins.push(mod);
+	Wriit.prototype[mod] = modules[mod];
+}
+/*Wriit.prototype.pasteEvent = {
 	Setup: function () {
 		var that = this;
 		var clipboard = $('<textarea style="display:none;">');
@@ -529,7 +522,7 @@ Wriit.prototype.strikethrough = {
 		toolbar.AddButton(fmulti);
 		this.Callback(fmulti, this.Insert);
 	}
-};*/
+};* /
 Wriit.prototype.forecolor = {
 	Setup: function (toolbar) {
 		let tag = new StyleTag('forecolor');
@@ -544,6 +537,7 @@ Wriit.prototype.forecolor = {
 		this.Callback(fmulti, this.Insert);
 	}
 };
+*/
 $.fn.wriit = function (cfg) {
 	$(this).each(function () {
 		return new Wriit($(this), cfg);

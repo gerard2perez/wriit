@@ -8,12 +8,15 @@ module.exports = function (grunt) {
 						debug: true
 					},
 					transform: [
-						["babelify"],
-						//["uglifyify"]
+						["babelify"]
 					]
 				},
 				files: {
-					"dist/wriit.js": ["src/*.js"]
+					"dist/wriit.js": [
+						"src/*.js",
+						"src/modules/*.js",
+						"src/tags/*.js"
+					]
 				}
 			},
 			dist: {
@@ -28,12 +31,21 @@ module.exports = function (grunt) {
                ]
 				},
 				files: {
-					"dist/wriit.js": ["src/*.js"]
+					"dist/wriit.js": [
+						"src/*.js",
+						"src/modules/*.js",
+						"src/tags/*.js"
+					]
 				}
 			}
 		},
 		jshint: {
-			files: ['Gruntfile.js', 'src/*.js'],
+			files: [
+				'Gruntfile.js',
+				"src/*.js",
+				"src/modules/*.js",
+				"src/tags/*.js"
+			],
 			options: {
 				"validthis": true,
 				"esnext": true,
@@ -44,7 +56,7 @@ module.exports = function (grunt) {
 		},
 		watch: {
 			files: ['<%= jshint.files %>'],
-			tasks: ['jshint','browserify:dev']
+			tasks: ['jshint', 'browserify:dev']
 		},
 		clean: {
 			build: ["tmp"],
@@ -60,5 +72,5 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks("grunt-browserify");
 	//grunt.registerTask('build', ['clean:build', 'browserify:dev']);
 	//grunt.registerTask('prod', ['clean:release', 'babel:prod']);
-	grunt.registerTask('dev', ['jshint','clean:release','browserify:dev', 'watch']);
+	grunt.registerTask('dev', ['jshint', 'clean:release', 'browserify:dev', 'watch']);
 };
