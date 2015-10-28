@@ -1,11 +1,9 @@
-"use strict";
-
-function makeChildSiblings(node) {
-	var parent = node.parentNode;
-	while (node.childNodes.length > 0) {
-		parent.insertBefore(node.childNodes[0], node);
-	}
-}
+/*global document,window,$,console,setInterval,Basic,Many,MultiClass,WriitStyle,regexp*/
+import Module from './wriit-modules';
+import {Single,StyleTag,StyleAttr} from './wriit-tags';
+import Toolbar from './wriit-toolbar';
+import iTextArea from './iTextArea';
+import KeyHandler from './keyhandler';
 
 var GPEGui = {
 	engine: {
@@ -42,7 +40,6 @@ function MatchNT(text, tag) {
 	let x = text.match(tag);
 	return x ? x.length : 0;
 }
-
 function findNT(txt, tag) {
 	var so = regexp("[__Tag__]");
 	var x = txt.replace(regexp(tag, "g"), "[__Tag__]");
@@ -51,23 +48,21 @@ function findNT(txt, tag) {
 }
 
 function str_replace(search, replace, subject) {
-	var f = search,
-		r = replace,
-		s = subject;
+	var s = subject;
 	var ra = r instanceof Array,
 		sa = s instanceof Array,
-		f = [].concat(f),
-		r = [].concat(r),
+		f = [].concat(search),
+		r = [].concat(replace),
 		i = (s = [].concat(s)).length,
 		j = 0;
 
 	while (j = 0, i--) {
 		if (s[i]) {
-			while (s[i] = (s[i] + '').split(f[j]).join(ra ? r[j] || "" : r[0]), ++j in f) {};
+			while (s[i] = (s[i] + '').split(f[j]).join(ra ? r[j] || "" : r[0]), ++j in f) {}
 		}
-	};
+	}
 	return sa ? s : s[0];
-};
+}
 
 var totalGPET = 0;
 var _i = '<li id="i" name="em" value="3"></li>';
@@ -94,7 +89,19 @@ var _hl = '<li id="hr" name="hr" value="21"></li>';
 var _unformat = '<li id="unformart" value="0"></li>';
 
 var template = '<section class="wriit-box"><menu></menu><div data-wriit-role="text-area"></div><div class="tagi"></div></section>';
-var installedplugins = ['bold', 'pasteEvent', 'italic', 'underline', 'strikethrough', 'pown', 'subindex', 'undo', 'redo', 'paragraph', 'forecolor'];
+var installedplugins = [
+	'bold',
+//	'pasteEvent',
+//	'italic',
+//	'underline',
+//	'strikethrough',
+//	'pown',
+//	'subindex',
+//	'undo',
+//	'redo',
+//	'paragraph',
+//	'forecolor'
+];
 
 function getTag(node, tags) {
 	for (let prop in tags) {
@@ -105,13 +112,12 @@ function getTag(node, tags) {
 	}
 	return null;
 }
-
 function findAllTags(node, container, tags) {
 	for (let nname in node.children) {
 		let newnode = node.children[nname];
-		if (newnode.nodeType == 1) {
+		if (newnode.nodeType === 1) {
 			let tag = getTag(newnode, tags);
-			if (tag != null) {
+			if (tag !== null) {
 				container[tag.Id] = tag;
 			}
 			findAllTags(newnode, container, tags);
@@ -120,7 +126,6 @@ function findAllTags(node, container, tags) {
 		}
 	}
 }
-
 function NodeAnalysis(tags, maincontainer) {
 	let left = {};
 	let middle = {};
@@ -129,30 +134,30 @@ function NodeAnalysis(tags, maincontainer) {
 	let leftNode = this.startContainer.parentNode;
 	let rightNode = this.endContainer.parentNode;
 	let common = null;
-	if (leftNode == rightNode) {
+	if (leftNode === rightNode) {
 		common = leftNode;
 		let insider = this.cloneContents();
 		findAllTags(insider, middle, tags);
 	} else {
-		while (leftNode != this.commonAncestorContainer) {
+		while (leftNode !== this.commonAncestorContainer) {
 			let tag = getTag(leftNode, tags);
-			if (tag != null) {
+			if (tag !== null) {
 				left[tag.Id] = tag;
 			}
 			leftNode = leftNode.parentNode;
 		}
-		while (rightNode != this.commonAncestorContainer) {
+		while (rightNode !== this.commonAncestorContainer) {
 			let tag = getTag(rightNode, tags);
-			if (tag != null) {
+			if (tag !== null) {
 				right[tag.Id] = tag;
 			}
 			rightNode = rightNode.parentNode;
 		}
 		common = this.commonAncestorContainer;
 	}
-	while (common != maincontainer) {
+	while (common !== maincontainer) {
 		let tag = getTag(common, tags);
-		if (tag != null) {
+		if (tag !== null) {
 			contain[tag.Id] = tag;
 		}
 		common = common.parentNode;
@@ -164,10 +169,10 @@ function NodeAnalysis(tags, maincontainer) {
 		let glow = false;
 		if (tag instanceof Single) {
 			plugs[tag.Id] = {
-				isSorrounded: contain[tag.Id] != null,
-				isContained: middle[tag.Id] != null,
-				isOpened: right[tag.Id] != null,
-				isClosed: left[tag.Id] != null,
+				isSorrounded: contain[tag.Id] !== undefined,
+				isContained: middle[tag.Id] !== undefined,
+				isOpened: right[tag.Id] !== undefined,
+				isClosed: left[tag.Id] !== undefined,
 				deep: 0
 			};
 			if (plugs[tag.Id].isSorrounded) {
@@ -178,13 +183,13 @@ function NodeAnalysis(tags, maincontainer) {
 			}
 		} else if (tag instanceof Many) {
 			plugs[tag.SuperId] = {
-				isSorrounded: plugs[tag.SuperId] != null ? plugs[tag.SuperId].isSorrounded || contain[tag.Id] != null : contain[tag.Id],
-				isContained: plugs[tag.SuperId] != null ? plugs[tag.SuperId].isContained || middle[tag.Id] != null : middle[tag.Id],
-				isOpened: plugs[tag.SuperId] != null ? plugs[tag.SuperId].isOpened || right[tag.Id] != null : right[tag.Id] != null,
-				isClosed: plugs[tag.SuperId] != null ? plugs[tag.SuperId].isClosed || left[tag.Id] != null : left[tag.Id] != null,
+				isSorrounded: plugs[tag.SuperId] !== null ? plugs[tag.SuperId].isSorrounded || contain[tag.Id] !== null : contain[tag.Id],
+				isContained: plugs[tag.SuperId] !== null ? plugs[tag.SuperId].isContained || middle[tag.Id] !== null : middle[tag.Id],
+				isOpened: plugs[tag.SuperId] !== null ? plugs[tag.SuperId].isOpened || right[tag.Id] !== null : right[tag.Id] !== null,
+				isClosed: plugs[tag.SuperId] !== null ? plugs[tag.SuperId].isClosed || left[tag.Id] !== null : left[tag.Id] !== null,
 				deep: 0
 			};
-			if (contain[tag.Id] != null) {
+			if (contain[tag.Id] !== null) {
 				glow=true;
 				button.classList.add('active');
 			} else {
@@ -201,211 +206,23 @@ function NodeAnalysis(tags, maincontainer) {
 	}
 	return plugs;
 }
-
 function addtotagi(e) {
 	$(this).parent().find('.tagi').html('');
 	var x = $(document.getSelection().anchorNode.parentNode);
 	var i = 0;
-	while (x.get(0) != this) {
+	while (x.get(0) !== this) {
 		var li = $('<span>' + x.get(0).localName + '</span>');
 		$(this).parent().find('.tagi').prepend(li);
 		x = x.parent();
 	}
 }
-let Toolbar = function (that) {
-	let add = function (button) {
-		let newB = document.createElement('button');
-		newB.setAttribute("data-wriit-commandId", button.Id);
-		newB.setAttribute("class", button.DisplayClass);
-		let span = document.createElement('span');
-		span.innerHTML = button.ToolTip;
-		newB.appendChild(span);
-		that.buttons[button.Id] = newB;
-		that.tags[button.Id] = button;
-		that.menu.append(newB);
-		return button.Id;
-	}
-	this.AddButton = function (button) {
-		if (button instanceof Basic) {
-			add(button);
-		} else if (button instanceof MultiClass) {
-			for (let prop in button.children) {
-				add(button.children[prop]);
-			}
-		} else if (button instanceof MultiAttr) {
-			for (let prop in button.children) {
-				add(button.children[prop]);
-			}
-		}
-		return button;
-	}
-	Object.defineProperty(this, 'AddButton', {
-		writable: false,
-		enumerable: true,
-		configurable: true
-	});
-};
-let Module = function (that) {
-	let mod = this;
-	this.Tag;
-	this.Editor = that;
-	Object.defineProperty(this, "Selection", {
-		get: function () {
-			return mod.Tag.SuperId != null ? that.Modules[mod.Tag.SuperId] : that.Modules[mod.Tag.Id];
-		},
-	});
-	Object.defineProperty(this, "Visual", {
-		get: function () {
-			return that.html.getSelection(0).visual;
-		},
-	});
-	this.visual;
-}
-Module.prototype = {
-	Editor: null,
-	TearDown: null,
-	IMany: function (textarea) {
-		let selection = this.Selection;
-		let visual = this.Visual;
-		let node = visual.commonAncestorContainer;
-		if (node.nodeType != 1) {
-			node = node.parentNode;
-		}
-		if (selection.isSorrounded) {
-			for (let t in this.Tag.Parent.children) {
-				let tag = this.Tag.Parent.children[t];
-				this.Editor.button(tag.Id).classList.remove('active');
-			}
-			while (node.tagName.toLowerCase() != this.Tag.TagName.toLowerCase()) {
-				node = node.parentNode;
-			}
-			if (this.Tag.isCompatible(node)) {
-				for (let attr in this.Tag.Attr) {
-					this.Tag.UpdateAttributes(node);
-					//node.setAttribute(attr, this.Tag.Attr[attr]);
-				}
-				this.Editor.button(this.Tag.Id).classList.add('active');
-			}
-		} else if (!(this.Tag.Parent instanceof MultiClass)) {
-			let newel = this.Tag.new();
-			newel.appendChild(visual.extractContents());
-			visual.insertNode(newel);
-			textarea.normalize();
-		}
-		document.getSelection().removeAllRanges();
-		document.getSelection().addRange(visual);
-	},
-	ISingle: function (textarea) {
-		let selection = this.Selection;
-		let visual = this.Visual;
-		if (visual.collapsed && selection.isSorrounded) {
-			let oldnode = visual.startContainer.parentNode;
-			while (!this.Tag.isInstance(oldnode)) {
-				oldnode = oldnode.parentNode;
-			}
-			makeChildSiblings(oldnode);
-			oldnode.remove();
-		} else {
-			let newel = this.Tag.new();
-			newel.appendChild(visual.extractContents());
-			visual.insertNode(newel);
-			if (this.Tag.isInstance(newel.nextSibling)) {
-				let sibling = newel.nextSibling;
-				Array.prototype.forEach.call(sibling.childNodes, function (innerchild) {
-					newel.appendChild(innerchild);
-				});
-				sibling.remove();
-			}
-			if (this.Tag.isInstance(newel.previousSibling)) {
-				let sibling = newel.previousSibling;
-				Array.prototype.forEach.call(sibling.childNodes, function (innerchild) {
-					newel.insertBefore(innerchild, newel.firstChild);
-				});
-				sibling.remove();
-			}
-			if (selection.isContained + selection.isOpened + selection.isClosed) {
-				let cleannode = visual.extractContents().firstChild;
-				let inner = cleannode.querySelectorAll(this.Tag.TagName);
-				for (let i = 0; i < inner.length; i++) {
-					makeChildSiblings(inner[i]);
-					inner[i].remove();
-				}
-				visual.insertNode(newel);
-			}
-			textarea.parentNode.querySelectorAll("[data-wriit-commandId=" + this.Tag.Id + "]")[0].classList.add('active');
-		}
-		textarea.normalize();
-		document.getSelection().removeAllRanges();
-		document.getSelection().addRange(visual);
-	},
-	Insert: function (e, textarea) {
-		if (this.Tag instanceof Single) {
-			this.ISingle.apply(this, [textarea]);
-		} else if (this.Tag instanceof Many) {
-			this.IMany.apply(this, [textarea]);
-		}
-	},
-	Callback: function (tag, fn) {
-		let apply = function (tag) {
-			let button = this.Editor.buttons[tag.Id];
-			let mod = this;
-			button.addEventListener('click', function (e, routedevent) {
-				mod.Tag = tag;
-				this.event = routedevent || e;
-				if (this.BeforeFormat != null) {
-					mod.BeforeFormat.apply(mod, [routedevent || e])
-				}
-				let res = fn.apply(mod, [routedevent || e, mod.Editor.textarea.get(0)]);
-				if (this.AfterFormat != null) {
-					this.AfterFormat.apply(mod, [routedevent || e])
-				}
-				return res;
-			});
-			if (!!tag.Shortcut) {
-				this.Editor.textarea.keys.bind(tag.Shortcut, function (e) {
-					$(button).trigger('click', e);
-					return false;
-				});
-			}
-		}
-		if (tag instanceof Single) {
-			apply.apply(this, [tag]);
-		} else if (tag instanceof MultiClass) {
-			for (let i in tag.children) {
-				apply.apply(this, [tag.children[i]]);
-			}
-		} else if (tag instanceof MultiAttr) {
-			for (let i in tag.children) {
-				apply.apply(this, [tag.children[i]]);
-			}
-		}
-
-	},
-	BeforeFormat: null,
-	AfterFormat: null,
-	Setup: null
-};
-Object.defineProperty(Module, 'IMany', {
-	writable: false,
-	enumerable: false
-});
-Object.defineProperty(Module, 'Insert', {
-	writable: false,
-	enumerable: false
-});
-Object.defineProperty(Module, 'ISingle', {
-	writable: false,
-	enumerable: false
-});
-
 function Wriit(parent, cfg) {
-	"use strict";
 	let privateData = new WeakMap();
 	let props = {
-		dataindex: [Object()],
-		data: Object()
+		dataindex: [Object.create(null)],
+		data: Object.create(null)
 	};
-	let indexes = [Object()];
+	let indexes = [Object.create(null)];
 	var compiled = $(template);
 	this.textarea = compiled.find("[data-wriit-role=text-area]");
 	this.textarea.html(parent.html());
@@ -415,13 +232,13 @@ function Wriit(parent, cfg) {
 		Modules: installedplugins
 	});
 	var that = this;
-	var prototype = that.__proto__;
+	var prototype = Object.getPrototypeOf(that);
 	this.html = {
 		get selection() {
 			return this.getSelection(0).coord;
 		},
 		getSelection: function (n) {
-			n = n || 0
+			n = n || 0;
 			var html = that.textarea.html();
 			var coord = that.textarea.getSelection(n);
 			var range = coord.rang;
@@ -452,68 +269,64 @@ function Wriit(parent, cfg) {
 				}
 			};
 		}
-	}
+	};
 	this.selection = function (tagid) {
 		return this.Modules[tagid].selection;
 	};
-	this.textarea.keyhandler(); {
-		"use strict";
+	this.textarea.KeyHandler(); {
 		let block = false;
 		let initialValue = this.textarea.html().trim();
-
-		function storeInfo(force) {
+		let storeInfo = function (force) {
 			let index = privateData.get(compiled.get(0)) || [];
-			if (indexes.length == 51) {
+			if (indexes.length === 51) {
 
 			}
 			let prop = index[index.length - 1];
 			let textvalue = that.textarea.html().trim();
 			let data = privateData.get(prop);
 
-			if (data == undefined && textvalue != initialValue) {
-				prop = Object();
+			if (data === undefined && textvalue !== initialValue) {
+				prop = Object.create(null);
 				privateData.set(prop, initialValue);
 				index.push(prop);
 				privateData.set(compiled.get(0), index);
-				that.buttons['undo'].attr('disabled', false);
+				that.buttons.undo.attr('disabled', false);
 				return true;
 			} else if (
 
-				(data && Math.abs(textvalue.length - data.length) > 15) || (force && textvalue != data)
+				(data && Math.abs(textvalue.length - data.length) > 15) || (force && textvalue !== data)
 			) {
 				console.log("Store", textvalue);
-				prop = Object();
+				prop = Object.create(null);
 				privateData.set(prop, textvalue);
 				index.push(prop);
 				privateData.set(compiled.get(0), index);
-				that.buttons['undo'].attr('disabled', false);
+				that.buttons.undo.attr('disabled', false);
 				return true;
 			}
-			return (data != undefined) && (data && data != textvalue);
-		}
+			return (data !== undefined) && (data && data !== textvalue);
+		};
 
-		function clearInfo() {
+		let clearInfo = function () {
 			privateData.set(that.textarea.get(0), []);
-			that.buttons['redo'].attr('disabled', true);
-		}
+			that.buttons.redo.attr('disabled', true);
+		};
 		compiled.bind('savecontent', function (e) {
-			"use strict";
 			while (block);
 			block = true;
 			try {
 				if (storeInfo()) {
 					clearInfo();
 				} else {
-					that.buttons['undo'].attr('disabled', true);
+					that.buttons.undo.attr('disabled', true);
 				}
-			} catch (e) {
-				console.log(e);
+			} catch (ex) {
+				console.log(ex);
 			}
 			block = false;
 		});
 
-		function ctrlz() {
-			"use strict";
+		let ctrlz = function () {
 			while (block);
 			block = true;
 			let stored = storeInfo(true);
@@ -539,16 +352,16 @@ function Wriit(parent, cfg) {
 				that.html.getSelection(0).visual.setEndBefore(node);
 				sel.addRange(that.html.getSelection(0).visual);
 
-				that.buttons['redo'].attr('disabled', false);
+				that.buttons.redo.attr('disabled', false);
 			}
 			block = false;
 			//		$(this).trigger('keyup', e);
 			return false;
 
-		}
+		};
 		this.textarea.keys.bind("CMD+Z", ctrlz);
 		prototype.undo = {
-			Setup: function () {
+			Setup: function (toolbar) {
 				this.Callback(toolbar.AddButton(new Single("undo", "_undo", {
 					tooltip: "Undo",
 					displayclass: "fa fa-undo"
@@ -556,12 +369,12 @@ function Wriit(parent, cfg) {
 			}
 		};
 		prototype.redo = {
-			Setup: function () {
+			Setup: function (toolbar) {
 				this.Callback(toolbar.AddButton(new Single("redo", "_redo", {
 					tooltip: "Repeat",
 					displayclass: "fa fa-repeat"
 				})), ctrlz);
-				that.buttons['redo'].setAttribute('disabled', true);
+				that.buttons.redo.setAttribute('disabled', true);
 			}
 		};
 	}
@@ -584,7 +397,7 @@ function Wriit(parent, cfg) {
 	let toolbar = new Toolbar(this);
 	Object.freeze(toolbar);
 	this.cfg.Modules.forEach(function (plugin) {
-		if (prototype[plugin].Setup != null) {
+		if (prototype[plugin].Setup !== null) {
 			prototype[plugin] = $.extend(new Module(that), prototype[plugin]);
 			prototype[plugin].Setup(toolbar);
 		}
@@ -592,8 +405,7 @@ function Wriit(parent, cfg) {
 	this.button = function (id) {
 		return that.buttons[id];
 	};
-};
-
+}
 Wriit.prototype.pasteEvent = {
 	Setup: function () {
 		var that = this;
@@ -640,7 +452,7 @@ Wriit.prototype.bold = {
 	Setup: function (toolbar) {
 		let bold = new Single("bold", "strong", {
 			tooltip: "Bold",
-			displayclass: "fa fa-bold",
+			iconclass: "fa fa-bold",
 			shortcut: "CMD+SHIFT+B"
 		});
 		toolbar.AddButton(bold);
@@ -691,7 +503,7 @@ Wriit.prototype.strikethrough = {
 		})), this.Insert);
 	}
 };
-Wriit.prototype.paragraph = {
+/*Wriit.prototype.paragraph = {
 	Setup: function (toolbar) {
 		let fmulti = new MultiClass('paragraph', "p");
 		fmulti.Add('left', 'text-left', {
@@ -717,11 +529,14 @@ Wriit.prototype.paragraph = {
 		toolbar.AddButton(fmulti);
 		this.Callback(fmulti, this.Insert);
 	}
-};
+};*/
 Wriit.prototype.forecolor = {
 	Setup: function (toolbar) {
-		let c = new WriitStyle("color");
-		let fmulti = new MultiAttr('forecolor', "span", c);
+		let tag = new StyleTag('forecolor');
+		let prop = tag.newProperty("color");
+		tag.Add(prop.KeyValue('#FF0000','red') );
+		
+		let fmulti = new StyleAttr('forecolor', "span", c);
 		fmulti.Add('red', c.apply('#00FF00'), {
 			displayclass: "fa fa-font"
 		},true);
@@ -729,7 +544,6 @@ Wriit.prototype.forecolor = {
 		this.Callback(fmulti, this.Insert);
 	}
 };
-
 $.fn.wriit = function (cfg) {
 	$(this).each(function () {
 		return new Wriit($(this), cfg);

@@ -3,3 +3,7 @@
 /fonts/*
 /css/font-awesome.css
 /css/font-awesome.min.css
+/node_modules/
+/bower_components/
+/temp/
+/tmp/

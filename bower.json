@@ -1,0 +1,29 @@
+{
+  "name": "wriit",
+  "version": "0.0.1",
+  "homepage": "https://github.com/gerard2p/wriit",
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "keywords": [
+    "wriit",
+    "web-editor",
+    "editor",
+    "wysiwyg",
+    "wysiwyg-editor"
+  ],
+  "authors": [
+    "Gerardo Pérez Pérez"
+  ],
+  "license": "MPL-2.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4"
+  }
+}

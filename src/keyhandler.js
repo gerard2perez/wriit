@@ -1,4 +1,3 @@
-"use strict";
 let keys = {
 	"8": "CARRY",
 	"13": "ENTER",
@@ -19,7 +18,7 @@ let routekey = {
 	"CTRL": "CMD",
 	"CMD": "CTRL"
 };
-let keyhandler = function (el, settings) {
+let KeyHandler = function (el, settings) {
 	el.data('events', {});
 	el.bind("keydown", function (e, routedevent) {
 		e = routedevent || e;
@@ -29,10 +28,9 @@ let keyhandler = function (el, settings) {
 		el.data('keys', currkeys);
 		let trigger = [];
 		for (let i in currkeys) {
-			trigger.push(currkeys[i])
-		};
+			trigger.push(currkeys[i]);
+		}
 		trigger = trigger.join('+');
-		console.log(trigger);
 		trigger = el.data('events')[trigger];
 		if (!!trigger) {
 			e.preventDefault();
@@ -60,23 +58,21 @@ let keyhandler = function (el, settings) {
 
 		}
 	}).bind('blur', function (e) {
-		console.log("LOST FOCUS");
 		el.data('keys', {});
 	});
 	return el;
 };
-(function ($) {
-	"use strict";
-	$.fn.keyhandler = function (settings) {
-		var config = {
+export default (function ($) {
+	$.fn.KeyHandler = function (settings) {
+		let config = {
 			ESC: false,
 			ENTER: false
-		}
+		};
 		config = $.extend({}, config, settings);
 		$(this).each(function () {
-			return new keyhandler($(this), settings);
+			return new KeyHandler($(this), settings);
 		});
-	}
+	};
 	Object.defineProperty($.fn, "keypressed", {
 		get: function () {
 			return $(this).data('keys');
@@ -93,7 +89,6 @@ let keyhandler = function (el, settings) {
 					for (let i in cmds) {
 						if (!!routekey[cmds[i]]) {
 							cmds[i] = routekey[cmds[i]];
-							console.log("ROUTING: " + cmds.join('+'));
 							that.data('events')[cmds.join('+')] = fn;
 						}
 					}
