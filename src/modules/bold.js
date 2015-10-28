@@ -1,4 +1,4 @@
-import {Single} from '../wriit-tags';
+import {Single} from '../tags';
 export default {
 	Setup: function (toolbar) {
 		let bold = new Single("bold", "strong", {

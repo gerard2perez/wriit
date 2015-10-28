@@ -1,6 +1,6 @@
 /*global document,window,$,console,setInterval,Basic,Many,MultiClass,WriitStyle,regexp*/
-import Module from './wriit-modules';
-import {Single,StyleTag,StyleAttr} from './wriit-tags';
+import Module from './Module';
+import {Single,StyleTag,StyleAttr} from './tags';
 import Toolbar from './wriit-toolbar';
 import iTextArea from './iTextArea';
 import KeyHandler from './keyhandler';

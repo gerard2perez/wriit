@@ -88,49 +88,6 @@ BaseTag.prototype.isCompatible = function (htmlnode) {
 /*export function StyleTag(id) {
 	BaseTag.call(this, id,"span",null,true);
 }*/
-
-class Base {
-	constructor(id, tag, attributes, highlight) {
-		this.Id = id;
-		this.highlight = true;
-		this.TagName = tag;
-		this.Attributes = [];
-		this.Shortcut = attributes.shortcut || null;
-		this.ToolTip = attributes.tooltip || null;
-		this.IconClass = attributes.iconclass || null;
-	}
-	isCompatible(htmlnode) {
-		if (htmlnode.nodeType !== 1 || htmlnode.tagName.toLowerCase() !== this.TagName.toLowerCase()) {
-			return false;
-		}
-		return true;
-	}
-	isInstance(htmlnode) {
-		if (!this.isCompatible(htmlnode)) {
-			return false;
-		}
-		for (let attr in this.Attr) {
-			let atribute = this.Attr[attr];
-			if (atribute instanceof StyleAttr) {
-				if (htmlnode.style[atribute.attr] === "") {
-					return false;
-				}
-			} else if (atribute instanceof GeneralAttr) {
-				if (htmlnode.attributes[attr].value !== this.Attr[attr]) return false;
-			} else if (atribute instanceof ClassAttr) {
-				if (htmlnode.classList) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-	new() {
-		let el = document.createElement(this.TagName);
-		//this.UpdateAttributes(el);
-		return el;
-	}
-}
 class AttrGenerator {
 	constructor(gen, property) {
 		this.gen = gen;
@@ -140,24 +97,6 @@ class AttrGenerator {
 		return new this.gen(this.property, value);
 	}
 }
-
-export class StyleTag extends Base {
-	constructor(...args) {
-		super(...args);
-	}
-	newProperty(property) {
-		return new AttrGenerator(StyleAttr, property);
-	}
-	Add(attribute) {
-		this.Attributes[attribute.attr] = attribute;
-	}
-}
-export class Single extends Base {
-	constructor(id, tag, options) {
-		super(id, tag, options, false);
-	}
-}
-
 /*
 function WriitAttr(attr) {
 	this.attr = attr;
