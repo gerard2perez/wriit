@@ -84,7 +84,6 @@ BaseTag.prototype.isCompatible = function (htmlnode) {
 	}
 	return true;
 };
-
 /*export function StyleTag(id) {
 	BaseTag.call(this, id,"span",null,true);
 }*/
@@ -117,61 +116,6 @@ WriitStyle.prototype.apply = function (value) {
 };
 Object.freeze(WriitAttr);
 Object.freeze(WriitStyle);
-
-
-
-
-function Basic(id, tag, attributes,blow) {
-	this.Mime = blow === true;
-	attributes = attributes || {};
-	this.Id = id;
-	this.SuperId = null;
-	this.Parent = null;
-	this.TagName = tag;
-	this.Shortcut = attributes.shortcut || null;
-	delete attributes["shortcut"];
-	this.ToolTip = attributes.tooltip || null;
-	delete attributes["tooltip"];
-	this.DisplayClass = attributes.displayclass || null;
-	delete attributes["displayclass"];
-	this.Attr = attributes;
-	this.AttrMatch = function (attr, value) {
-		return this.Attr[attr] === value;
-	}
-	this.isInstance = function (htmlnode) {
-		if (htmlnode.nodeType != 1) {
-			return false;
-		}
-		if (htmlnode.tagName.toLowerCase() != this.TagName.toLowerCase()) {
-			return false;
-		}
-		for (let attr in this.Attr) {
-			let atribute = this.Attr[attr];
-			if (atribute instanceof StyleAttr) {
-				if(htmlnode.style[atribute.attr]==""){return false;}
-			} else if (atribute instanceof GeneralAttr) {
-				if (htmlnode.attributes[prop].value != this.Attr[prop]) return false;
-			}
-		}
-		return true;
-	}
-	this.new = function () {
-		let el = document.createElement(this.TagName);
-		this.UpdateAttributes(el);
-		return el;
-	}
-	this.UpdateAttributes = function (node) {
-		for (let attr in this.Attr) {
-			let atribute = this.Attr[attr];
-			if (atribute instanceof StyleAttr) {
-				node.style[atribute.attr]=atribute.value;
-			} else if (atribute instanceof GeneralAttr) {
-				node.setAttribute(attr, this.Attr[attr]);
-			}
-		}
-	}
-}
-
 function Many(id, tag, attributes, blow) {
 	this.isCompatible = function (node) {
 		if (node.nodeType != 1) {
@@ -208,31 +152,6 @@ function MultiAttr(id, tag) {
 		delete this.children[subid];
 	};
 }
-function MultiClass(id, tag) {
-	this.Id = id;
-	this.TagName = tag;
-	this.children = {};
-	this.FindByClass = function (classname) {
-		for (let child in this.children) {
-			if (this.children[child].AttrMatch("class", classname)) {
-				return this.children[child];
-			}
-		}
-	}
-	this.Add = function (subid, classname, attributes) {
-		attributes = attributes || {};
-		attributes.class = classname;
-		this.children[subid] = new Many(this.Id + "_" + subid, this.TagName, attributes, "class");
-		this.children[subid].SuperId = this.Id;
-		this.children[subid].Parent = this;
-		Object.freeze(this.children[subid]);
-	}
-	this.Remove = function (clasname) {
-		delete this.children[subid];
-	}
-}
-
-
 //==============Experimental
 function MultiStyle(id, tag) {
 	this.Id = id;
@@ -257,9 +176,4 @@ function MultiStyle(id, tag) {
 		delete this.children[subid];
 	};
 }
-
-Single.prototype = Object.create(Basic.prototype);
-Many.prototype = Object.create(Basic.prototype);
-Object.freeze(Single);
-Object.freeze(Many);
 */

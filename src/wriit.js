@@ -1,7 +1,7 @@
-/*global document,window,$,console,setInterval,Basic,Many,MultiClass,WriitStyle,regexp*/
+/*global document,window,$,console,setInterval,Basic,Many,WriitStyle,regexp*/
 import Module from './Module';
 import {Single,StyleTag,StyleAttr} from './tags';
-import Toolbar from './wriit-toolbar';
+import Toolbar from './Toolbar';
 import iTextArea from './iTextArea';
 import KeyHandler from './keyhandler';
 import * as modules from './modules';
@@ -439,17 +439,6 @@ for(let mod in modules){
 			that.restore();
 			return false;
 		});
-	},
-};
-Wriit.prototype.bold = {
-	Setup: function (toolbar) {
-		let bold = new Single("bold", "strong", {
-			tooltip: "Bold",
-			iconclass: "fa fa-bold",
-			shortcut: "CMD+SHIFT+B"
-		});
-		toolbar.AddButton(bold);
-		this.Callback(bold, this.Insert);
 	},
 };
 Wriit.prototype.subindex = {

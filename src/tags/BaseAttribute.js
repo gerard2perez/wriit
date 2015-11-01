@@ -1,6 +1,7 @@
 export default class{
-	constructor(attr, value){
+	constructor(attr, value,tooltip){
 		this.attr = attr;
-	this.value = value;
+		this.value = value;
+		this.tooltip =tooltip;
 	}
 }

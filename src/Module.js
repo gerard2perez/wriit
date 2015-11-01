@@ -1,5 +1,5 @@
-/*global document,$,Many,MultiAttr,MultiClass*/
-import {Single, StyleTag} from './tags';
+/*global document,$,Many,MultiAttr*/
+import { Single, StyleTag, ClassTag } from './tags';
 
 function makeChildSiblings(node) {
 	var parent = node.parentNode;
@@ -11,18 +11,18 @@ export default class {
 	constructor(editor) {
 		this.Editor = editor;
 		this.Tag = {};
-		this.BeforeFormat=undefined;
-		this.AfterFormat=undefined;
-		this.TearDown=undefined;
-		this.Setup=undefined;
+		this.BeforeFormat = undefined;
+		this.AfterFormat = undefined;
+		this.TearDown = undefined;
+		this.Setup = undefined;
 	}
 	get Selection() {
 		return this.Tag.SuperId !== undefined ? this.Editor.Modules[this.Tag.SuperId] : this.Editor.Modules[this.Tag.Id];
 	}
-	get Visual(){
+	get Visual() {
 		return this.Editor.html.getSelection(0).visual;
 	}
-	IMany (textarea) {
+	IMany(textarea) {
 		let selection = this.Selection;
 		let visual = this.Visual;
 		let node = visual.commonAncestorContainer;
@@ -44,7 +44,7 @@ export default class {
 				}
 				this.Editor.button(this.Tag.Id).classList.add('active');
 			}
-		} else if (!(this.Tag.Parent instanceof MultiClass)) {
+		} else if (!(this.Tag.Parent instanceof ClassTag)) {
 			let newel = this.Tag.new();
 			newel.appendChild(visual.extractContents());
 			visual.insertNode(newel);
@@ -128,15 +128,11 @@ export default class {
 		};
 		if (tag instanceof Single) {
 			apply.apply(this, [tag]);
-		} else if (tag instanceof MultiClass) {
-			for (let i in tag.children) {
-				apply.apply(this, [tag.children[i]]);
-			}
-		} else if (tag instanceof MultiAttr) {
+		} else if (tag instanceof ClassTag) {
+		} else if (tag instanceof StyleTag) {
 			for (let i in tag.children) {
 				apply.apply(this, [tag.children[i]]);
 			}
 		}
-
 	}
 }

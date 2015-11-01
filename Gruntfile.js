@@ -15,7 +15,8 @@ module.exports = function (grunt) {
 					"dist/wriit.js": [
 						"src/*.js",
 						"src/modules/*.js",
-						"src/tags/*.js"
+						"src/tags/*.js",
+						"src/attributes/*.js"
 					]
 				}
 			},
@@ -34,7 +35,8 @@ module.exports = function (grunt) {
 					"dist/wriit.js": [
 						"src/*.js",
 						"src/modules/*.js",
-						"src/tags/*.js"
+						"src/tags/*.js",
+						"src/attributes/*.js"
 					]
 				}
 			}
@@ -44,7 +46,8 @@ module.exports = function (grunt) {
 				'Gruntfile.js',
 				"src/*.js",
 				"src/modules/*.js",
-				"src/tags/*.js"
+				"src/tags/*.js",
+				"src/attributes/*.js"
 			],
 			options: {
 				"validthis": true,

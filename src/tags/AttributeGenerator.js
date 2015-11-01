@@ -4,6 +4,6 @@ export default class{
 		this.property = property;
 	}
 	KeyValue(value, label) {
-		return new this.gen(this.property, value);
+		return new this.gen(this.property, value,label);
 	}
 }
