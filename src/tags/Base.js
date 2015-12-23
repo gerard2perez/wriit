@@ -1,42 +1,39 @@
 export default class {
 	constructor(id, tag, attributes, highlight) {
 		this.Id = id;
-		this.highlight = true;
+		this.highlight = highlight;
 		this.TagName = tag;
 		this.Attributes = [];
 		this.Shortcut = attributes.shortcut || null;
 		this.ToolTip = attributes.tooltip || null;
 		this.IconClass = attributes.iconclass || null;
+		this.button = null;
+		this.classList = [];
+		this.Render = 3;
 	}
 	isCompatible(htmlnode) {
+		if(htmlnode===null){return false;}
 		if (htmlnode.nodeType !== 1 || htmlnode.tagName.toLowerCase() !== this.TagName.toLowerCase()) {
 			return false;
 		}
 		return true;
 	}
 	isInstance(htmlnode) {
-		if (!this.isCompatible(htmlnode)) {
-			return false;
-		}
-		for (let attr in this.Attr) {
-			let atribute = this.Attr[attr];
-			if (atribute instanceof StyleAttr) {
-				if (htmlnode.style[atribute.attr] === "") {
-					return false;
-				}
-			} else if (atribute instanceof GeneralAttr) {
-				if (htmlnode.attributes[attr].value !== this.Attr[attr]) return false;
-			} else if (atribute instanceof ClassAttr) {
-				if (htmlnode.classList) {
-					return false;
-				}
-			}
-		}
-		return true;
+		return this.isCompatible(htmlnode);
 	}
 	new() {
 		let el = document.createElement(this.TagName);
-		//this.UpdateAttributes(el);
+		let that = this;
+		that.classList.forEach(function(classname){
+			el.classList.add(classname);
+		});
 		return el;
+	}
+	CanRemove(node){
+		return true;
+	}
+	
+	get instaceName(){
+		return (/function (.*)\(/g).exec(String(this.constructor))[1];
 	}
 }

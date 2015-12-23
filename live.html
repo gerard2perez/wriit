@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=yes">
+	<title>Wriit it easy</title>
+	<meta name="description" content="Distribuidor #1 de la marca Nissan en el Estado de Guanajuato">
+	<meta name="author" content="Gerardo Pérez Pérez">
+	<meta name="company" content="bitsun">
+	<link rel="stylesheet" href="wriit.css">
+	<link rel="stylesheet" href="../bower_components/font-awesome/css/font-awesome.css">
+	<link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css">
+</head>
+
+<body>
+	<div id="calc">
+		<p class="text-right">Hola <strong>soy <em>yo</em></strong><u> co</u>mo estas</p>
+		<p class="text-left">Hola <strong>soy <em>yo,</em></strong><u> ¿co</u>mo estas?</p>
+		<p class="text-center">Hola <strong>soy <em>yo</em></strong><u> co</u>mo estas.</p>
+	</div>
+	<script src="../bower_components/jquery/dist/jquery.min.js"></script>
+	<script src="wriit.js"></script>
+	<script src="http://localhost:62626/livereload.js"></script>
+	<script>
+		$(function () {
+			$("#calc").wriit({
+				cord: true
+			});
+		});
+	</script>
+</body>
+</html>

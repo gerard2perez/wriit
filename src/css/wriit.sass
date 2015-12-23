@@ -1,0 +1,191 @@
+.wriit-box
+	.square
+		display: inline-block
+		border: none
+		width: 20px
+		height: 20px
+		min-width: 5px
+		padding: 0px
+		margin: 0px
+		box-sizing: border-box
+
+	.itextarea-cords
+		padding: 4px 8px
+		border-radius: 2px
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5)
+		background-color: white
+		width: auto
+		display: inline-block
+
+	>menu 
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2)
+		margin: 0px
+		padding: 0px
+		font-size: 12px
+		.row
+			width: 100%
+			display: block
+			background-color: transparent
+			border: none
+
+	>menu>menu
+		padding: 9px 6px 3px
+		margin: 0px
+		align-items: flex-start
+		text-align: center
+		box-sizing: border-box
+		vertical-align: middle
+		letter-spacing: normal
+		word-spacing: normal
+		text-transform: none
+		text-indent: 0px
+		text-shadow: none
+		list-style: none
+
+	>menu>div
+		text-align: center
+		vertical-align: middle
+		&::before
+			line-height: 33px
+		menu
+			cursor: pointer
+			transition: all 0.2s linear
+			margin: 0px
+			min-width: 0px
+			min-height: 0px
+			padding: 0px
+			background-color: white
+			margin-top: 2px
+			margin-left: 4px
+			box-sizing: boder-box
+			overflow: hidden
+			height: 0px
+			box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5)
+			z-index: 10000
+			position: relative
+			text-align: left
+			border-radius: 2px
+			span
+				color: #333333
+				width: auto
+				display: block
+				border-bottom: 1px solid rgb(162, 162, 162)
+				padding: 3px
+				margin-bottom: 4px
+		&.hover menu
+			min-width: 250px
+			min-height: 100px
+			padding: 4px
+	>menu>span.separator
+		display: inline-block
+		width: 1px
+		border-right: 1px dashed #333
+		height: 25px
+		vertical-align: middle
+	>menu>button,
+	>menu>div 
+		transition: all 200ms
+		height: 35px
+		width: 35px
+		background-color: white
+		font-weight: 550
+		border: none
+		cursor: pointer
+		outline: none
+		position: relative
+		overflow: hidden
+		vertical-align: middle
+		&.disable
+			background-color:inherit
+			color: graytext
+		&.active 
+			background-color: rgba(210, 105, 30, 0.5)
+			color: white
+		.preview
+			bottom: 0px
+			left: 0px
+			width: 100%
+			height: 5px
+			display: block
+			position: absolute
+			margin: 0px
+			padding: 0px
+	>menu>div
+		&:hover
+			overflow: visible
+		&.active
+			color: white
+			overflow: visible
+			background-color: rgba(200, 200, 200, 1)
+			&:hover
+				background-color: rgba(100, 100, 100, 1)
+
+	>menu>button,
+	>menu>button.active 
+		&:hover
+			background-color: rgba(210, 105, 30, 1)
+			color: white
+			overflow: visible
+		&.disable:hover
+			background-color: lightgray
+			color: graytext
+	[data-wriit-role=text-area] 
+		outline: none
+		padding: 5px 0px
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2)
+		border-top: none
+
+	.tagi
+		background-color: white
+		margin-top: 2px
+
+	.tagi>*
+		display: inline-block
+		min-width: 20px
+		height: 20px
+		background-color: white
+		width: auto
+		font-size: 15px
+		text-align: center
+		padding: 2px 5px
+		border: 1px solid #EEE
+		margin-right: -1px
+		cursor: default
+		font-weight: bolder
+		color: #CCC
+.tooltip
+	color: white
+	position: absolute
+	z-index: 1000
+	top: 100%
+	left: 0%
+	position: absolute
+	font-size: 0.7em
+	&.hidden
+		canvas,span
+			opacity: 0
+	canvas,span
+		opacity: 1
+		transition: all 0.3s ease-in-out
+	canvas
+		position: absolute
+		top: -6px
+		left: 5px
+	span
+		background-color: black
+		display: inline-block
+		padding: 5px 10px
+		border-radius: 4px
+		font-weight: bolder
+
+.text-right
+	text-align: right
+
+.text-center
+	text-align: center
+
+.text-left
+	text-align: left
+
+.text-center
+	text-align: center

@@ -1,10 +1,10 @@
 import {Single} from '../tags';
 export default {
 	Setup: function (toolbar) {
-		let bold = new Single("bold", "strong", {
-			tooltip: "Bold",
-			iconclass: "fa fa-bold",
-			shortcut: "CMD+SHIFT+B"
+		let bold = new Single("Italic", "em", {
+			tooltip: "Italic",
+			iconclass: "fa fa-italic",
+			shortcut: "CMD+SHIFT+I"
 		});
 		toolbar.AddButton(bold);
 		this.Callback(bold, this.Insert);

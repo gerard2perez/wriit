@@ -1,10 +1,8 @@
 .DS_Store
-/fonts/
-/fonts/*
-/css/font-awesome.css
-/css/font-awesome.min.css
-/node_modules/
-/bower_components/
-/temp/
-/tmp/
-/dist/wriit.js
+/node_modules/*
+/bower_components/*
+/dist/*
+/.sass-cache/*
+.*.js
+_*.js
+src/**/index.js

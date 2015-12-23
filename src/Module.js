@@ -1,5 +1,12 @@
 /*global document,$,Many,MultiAttr*/
-import { Single, StyleTag, ClassTag } from './tags';
+import {
+	Single, StyleTag, ClassTag
+}
+from './tags';
+
+function test() {
+	alert('click');
+}
 
 function makeChildSiblings(node) {
 	var parent = node.parentNode;
@@ -11,10 +18,12 @@ export default class {
 	constructor(editor) {
 		this.Editor = editor;
 		this.Tag = {};
+		this.ApplyValue = null;
 		this.BeforeFormat = undefined;
 		this.AfterFormat = undefined;
 		this.TearDown = undefined;
 		this.Setup = undefined;
+		this.Namespace = null;
 	}
 	get Selection() {
 		return this.Tag.SuperId !== undefined ? this.Editor.Modules[this.Tag.SuperId] : this.Editor.Modules[this.Tag.Id];
@@ -22,49 +31,32 @@ export default class {
 	get Visual() {
 		return this.Editor.html.getSelection(0).visual;
 	}
-	IMany(textarea) {
-		let selection = this.Selection;
-		let visual = this.Visual;
-		let node = visual.commonAncestorContainer;
-		if (node.nodeType !== 1) {
-			node = node.parentNode;
-		}
-		if (selection.isSorrounded) {
-			for (let t in this.Tag.Parent.children) {
-				let tag = this.Tag.Parent.children[t];
-				this.Editor.button(tag.Id).classList.remove('active');
-			}
-			while (node.tagName.toLowerCase() !== this.Tag.TagName.toLowerCase()) {
-				node = node.parentNode;
-			}
-			if (this.Tag.isCompatible(node)) {
-				for (let attr in this.Tag.Attr) {
-					this.Tag.UpdateAttributes(node);
-					//node.setAttribute(attr, this.Tag.Attr[attr]);
-				}
-				this.Editor.button(this.Tag.Id).classList.add('active');
-			}
-		} else if (!(this.Tag.Parent instanceof ClassTag)) {
-			let newel = this.Tag.new();
-			newel.appendChild(visual.extractContents());
-			visual.insertNode(newel);
-			textarea.normalize();
-		}
-		document.getSelection().removeAllRanges();
-		document.getSelection().addRange(visual);
-	}
-	ISingle(textarea) {
+	Insert(e, textarea) {
 		let selection = this.Selection;
 		let visual = this.Visual;
 		if (visual.collapsed && selection.isSorrounded) {
 			let oldnode = visual.startContainer.parentNode;
 			while (!this.Tag.isInstance(oldnode)) {
+					oldnode = oldnode.parentNode;
+				}
+			if (this.Tag.CanRemove(oldnode,this.Attribute)) {
+				makeChildSiblings(oldnode);
+				oldnode.remove();
+				this.Editor.ToolBar.UnSelect(this.Tag);
+			}else{
+				this.Tag.Update(oldnode,this.Attribute);
+			}
+		} else if (selection.isSorrounded) {
+			let oldnode = visual.startContainer.parentNode;
+			while (!this.Tag.isInstance(oldnode) && oldnode != textarea) {
 				oldnode = oldnode.parentNode;
 			}
-			makeChildSiblings(oldnode);
-			oldnode.remove();
+			if (oldnode != textarea) {
+				this.Tag.Update(oldnode, this.Attribute);
+			}
+			this.Editor.ToolBar.Select(this.Tag);
 		} else {
-			let newel = this.Tag.new();
+			let newel = this.Tag.new(this.Attribute);
 			newel.appendChild(visual.extractContents());
 			visual.insertNode(newel);
 			if (this.Tag.isInstance(newel.nextSibling)) {
@@ -90,49 +82,55 @@ export default class {
 				}
 				visual.insertNode(newel);
 			}
+			let start = newel.childNodes[0];
+			let end = newel.childNodes[newel.childNodes.length - 1];
+			//visual.selectNodeContents(newel);
+			visual.setStart(start, 0);
+			visual.setEnd(end, end.length);
+			this.Editor.ToolBar.Select(this.Tag);
 		}
-		textarea.parentNode.querySelectorAll("[data-wriit-commandId=" + this.Tag.Id + "]")[0].classList.toggle('active');
-		textarea.normalize();
-		document.getSelection().removeAllRanges();
-		document.getSelection().addRange(visual);
-	}
-	Insert(e, textarea) {
-		if (this.Tag instanceof Single) {
-			this.ISingle.apply(this, [textarea]);
-		} else if (this.Tag instanceof Many) {
-			this.IMany.apply(this, [textarea]);
-		}
+		this.Editor.RestoreSelection();
 	}
 	Callback(tag, fn) {
-		let apply = function (tag) {
-			let button = this.Editor.buttons[tag.Id];
-			let mod = this;
-			button.addEventListener('click', function (e, routedevent) {
+		let button = tag.button;
+		let mod = this;
+
+		function Hanlder(tag, attribute) {
+			return function (e, routedevent) {
 				mod.Tag = tag;
+				mod.Attribute = attribute;
 				this.event = routedevent || e;
-				if (this.BeforeFormat !== undefined) {
+				if (mod.BeforeFormat !== undefined) {
 					mod.BeforeFormat.apply(mod, [routedevent || e]);
 				}
 				let res = fn.apply(mod, [routedevent || e, mod.Editor.textarea.get(0)]);
-				if (this.AfterFormat !== undefined) {
-					this.AfterFormat.apply(mod, [routedevent || e]);
+				mod.Editor.AddToHistory(mod.Editor.textarea, true);
+				if (mod.AfterFormat !== undefined) {
+					mod.AfterFormat.apply(mod, [routedevent || e]);
 				}
 				return res;
-			});
-			if (!!tag.Shortcut) {
-				this.Editor.textarea.keys.bind(tag.Shortcut, function (e) {
-					$(button).trigger('click', e);
-					return false;
-				});
-			}
-		};
+			};
+		}
+
+		function ManyHandler(minibutton) {
+			minibutton.button.addEventListener('click', Hanlder(tag, minibutton));
+		}
 		if (tag instanceof Single) {
-			apply.apply(this, [tag]);
+			button.addEventListener('click', Hanlder(tag, null));
 		} else if (tag instanceof ClassTag) {
-		} else if (tag instanceof StyleTag) {
-			for (let i in tag.children) {
-				apply.apply(this, [tag.children[i]]);
+			for (let prop in tag.children) {
+				tag.children[prop].button.addEventListener('click', Hanlder(tag, tag.children[prop]));
 			}
+		} else {
+			for (let prop in tag.children) {
+				tag.children[prop].forEach(ManyHandler);
+			}
+		}
+		if (!!tag.Shortcut) {
+			this.Editor.textarea.keys.bind(tag.Shortcut, function (e) {
+				$(button).trigger('click', e);
+				return false;
+			});
 		}
 	}
 }

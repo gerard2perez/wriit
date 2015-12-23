@@ -1,8 +1,19 @@
-export default class {
-	constructor(id, tag) {
+import {
+	Single, Base
+}
+from '../tags';
+import {
+	ClassAttr
+}
+from '../attributes';
+import Engine from './Engine';
+export default class ClassTag extends Base {
+	constructor(id, tag, opts) {
+		super(id, tag, opts || {});
 		this.Id = id;
 		this.TagName = tag;
 		this.children = {};
+		this.__button = document.createElement('div');
 	}
 	FindByClass(classname) {
 		for (let child in this.children) {
@@ -11,15 +22,55 @@ export default class {
 			}
 		}
 	}
-	Add(subid, classname, attributes) {
-		attributes = attributes || {};
-		attributes.class = classname;
-		this.children[subid] = new Many(this.Id + "_" + subid, this.TagName, attributes, "class");
-		this.children[subid].SuperId = this.Id;
-		this.children[subid].Parent = this;
-		Object.freeze(this.children[subid]);
+	isCompatible(htmlnode) {
+			return (htmlnode !== null && htmlnode !== undefined && htmlnode.nodeType === 1);
+		}
+			get button(){
+				switch(this.Render){
+					case Engine.button:
+						return this.AppliedTag ? this.AppliedTag.button:null;
+					default:
+						return this.__button;
+				}
+			}
+			set button(value){}
+	isInstance(node) {
+		if (!this.isCompatible(node)) {
+			return false;
+		}
+		for (let id in this.children) {
+			let child = this.children[id];
+			if (node.classList.contains(child.value)) {
+				this.AppliedTag = child;
+				return true;
+			}
+		}
+		return false;
 	}
-	Remove(clasname) {
-		delete this.children[subid];
+	Add(subid, classname, options) {
+		let that = this;
+		let classattr = new ClassAttr(this,this.Id, subid, classname, options);
+		classattr.Engine = this.Engine;
+		Object.defineProperty(classattr, 'Render', {
+			get: function () {
+				return that.Render;
+			}
+		});
+//		classattr.Render = Engine.button;
+		this.children[subid] = classattr;
+	}
+	CanRemove(node, attribute) {
+		return false;
+	}
+	Update(node, attribute) {
+		for (let id in this.children) {
+			node.classList.remove(this.children[id].value);
+		}
+		node.classList.add(attribute.value);
+	}
+	new(attribute) {
+		let el = super.new();
+		el.classList.add(attribute.value);
+		return el;
 	}
 }

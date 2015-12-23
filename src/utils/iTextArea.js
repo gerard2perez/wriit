@@ -1,4 +1,47 @@
 /*global $,jQuery*/
+function getName(node) {
+	if (node === null) {
+		return null;
+	}
+	let name = node.id === "" ? node.localName : "#" + node.id;
+	return name + (node.className !== "" ? "." + node.className.replace(" ", ".") : "");
+}
+
+function nodeOffset(node) {
+	let test = node;
+	let n = 0;
+	while (test.previousSibling !== null) {
+		test = test.previousSibling;
+		n++;
+	}
+	return n;
+
+}
+
+function getSelector(parent, node) {
+	let current = node;
+	let selector = "";
+	while (current != parent) {
+		switch (current.nodeType) {
+		case 1:
+			let sel = "";
+			let sibling = getName(current.previousElementSibling);
+			if (sibling !== null) {
+				sel = sibling + " + ";
+			}
+			selector = sel + getName(current) + " " + selector;
+			break;
+		case 3:
+			break;
+		}
+		current = current.parentNode;
+		if (current != parent && selector !== "") {
+			selector = " > " + selector;
+		}
+	}
+	return selector;
+}
+
 function taglength(node, full) {
 	"use strict";
 	let otext = node.wholeText !== undefined ? node.wholeText : node.outerHTML;
@@ -54,6 +97,16 @@ function textarea(parent, opts) {
 		for (let i = 0; i < selection.rangeCount; i++) {
 			let range = selection.getRangeAt(i);
 			ranges.push({
+				selectors: {
+					start: getSelector(parent, range.startContainer),
+					end: getSelector(parent, range.endContainer),
+					node: {
+						start: nodeOffset(range.startContainer),
+						end: nodeOffset(range.endContainer)
+					},
+					startOffset: range.startOffset,
+					endOffset: range.endOffset
+				},
 				start: dedeep(parent, range.commonAncestorContainer, range.startContainer, range.startOffset),
 				end: dedeep(parent, range.commonAncestorContainer, range.endContainer, range.endOffset),
 				rang: range
@@ -91,10 +144,32 @@ export default (function ($) {
 		if ($(this).data('rang')) {
 			return $(this).data('rang')[n];
 		}
+		return {};
 	};
 	Object.defineProperty($.fn, "selection", {
 		get: function () {
 			return $(this).data('rang')[0];
 		}
 	});
+	$.fn.RestoreRange = function (rang) {
+		let sel = window.getSelection();
+		sel.removeAllRanges();
+		let range = document.createRange();
+		let selectors = rang.selectors;
+		if (selectors === undefined) {
+			return;
+		}
+		let start = this.get(0).querySelector(selectors.start).childNodes[selectors.node.start];
+		let end = this.get(0).querySelector(selectors.end).childNodes[selectors.node.end];
+
+		if (start.nodeType === 1) {
+			start = start.childNodes[0];
+		}
+		if (end.nodeType === 1) {
+			end = end.childNodes[end.childNodes.length - 1];
+		}
+		range.setStart(start, selectors.startOffset);
+		range.setEnd(end, selectors.endOffset);
+		sel.addRange(range);
+	};
 })(jQuery);

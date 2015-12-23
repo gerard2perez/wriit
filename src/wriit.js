@@ -1,70 +1,6 @@
-/*global document,window,$,console,setInterval,Basic,Many,WriitStyle,regexp*/
-import Module from './Module';
-import {Single,StyleTag,StyleAttr} from './tags';
-import Toolbar from './Toolbar';
-import iTextArea from './iTextArea';
-import KeyHandler from './keyhandler';
 import * as modules from './modules';
-
-var GPEGui = {
-	engine: {
-		micro: 1,
-		mini: 2,
-		normal: 3,
-		extended: 4
-	},
-	visual: {
-		onselection: 1,
-		always: 2,
-		alternate: 3
-	}
-};
-var GPETags = {
-	command: 0,
-	span: 1,
-	id: 2,
-	tag: 3,
-	paragraph: 10,
-	multiSpan: 11,
-	multiClass: 12,
-	multiName: 13,
-	onlyInsert: 21,
-	multiOnlyInsert: 31,
-	list: 51
-};
-//1-10 Apertura y Cierre
-//11-20 Apertura y Cierre, Múltiples Valores
-//21-30 Apertura
-//31-40 Apertura, Múltiples Valores
-//51-xxx Todas las demás(Definir Independientemente)
-function MatchNT(text, tag) {
-	let x = text.match(tag);
-	return x ? x.length : 0;
-}
-function findNT(txt, tag) {
-	var so = regexp("[__Tag__]");
-	var x = txt.replace(regexp(tag, "g"), "[__Tag__]");
-	x = x.match(so);
-	return x ? x.length : 0;
-}
-
-function str_replace(search, replace, subject) {
-	var s = subject;
-	var ra = r instanceof Array,
-		sa = s instanceof Array,
-		f = [].concat(search),
-		r = [].concat(replace),
-		i = (s = [].concat(s)).length,
-		j = 0;
-
-	while (j = 0, i--) {
-		if (s[i]) {
-			while (s[i] = (s[i] + '').split(f[j]).join(ra ? r[j] || "" : r[0]), ++j in f) {}
-		}
-	}
-	return sa ? s : s[0];
-}
-
+import core from './core';
+/*
 var totalGPET = 0;
 var _i = '<li id="i" name="em" value="3"></li>';
 var _u = '<li id="u" value="1" extra=\'style:text-decoration:underline\'></li>';
@@ -101,6 +37,7 @@ function getTag(node, tags) {
 	}
 	return null;
 }
+
 function findAllTags(node, container, tags) {
 	for (let nname in node.children) {
 		let newnode = node.children[nname];
@@ -115,6 +52,7 @@ function findAllTags(node, container, tags) {
 		}
 	}
 }
+
 function NodeAnalysis(tags, maincontainer) {
 	let left = {};
 	let middle = {};
@@ -128,14 +66,14 @@ function NodeAnalysis(tags, maincontainer) {
 		let insider = this.cloneContents();
 		findAllTags(insider, middle, tags);
 	} else {
-		while (leftNode !== this.commonAncestorContainer) {
+		while (leftNode !== this.commonAncestorContainer && leftNode !== maincontainer) {
 			let tag = getTag(leftNode, tags);
 			if (tag !== null) {
 				left[tag.Id] = tag;
 			}
 			leftNode = leftNode.parentNode;
 		}
-		while (rightNode !== this.commonAncestorContainer) {
+		while (rightNode !== this.commonAncestorContainer && rightNode !== maincontainer) {
 			let tag = getTag(rightNode, tags);
 			if (tag !== null) {
 				right[tag.Id] = tag;
@@ -155,45 +93,30 @@ function NodeAnalysis(tags, maincontainer) {
 	for (let prop in tags) {
 		let tag = tags[prop];
 		let button = maincontainer.parentNode.querySelectorAll("[data-wriit-commandId=" + tag.Id + "]")[0];
-		let glow = false;
-		if (tag instanceof Single) {
-			plugs[tag.Id] = {
-				isSorrounded: contain[tag.Id] !== undefined,
-				isContained: middle[tag.Id] !== undefined,
-				isOpened: right[tag.Id] !== undefined,
-				isClosed: left[tag.Id] !== undefined,
-				deep: 0
-			};
-			if (plugs[tag.Id].isSorrounded) {
-				button.classList.add('active');
-				glow=true;
-			} else {
-				button.classList.remove('active');
-			}
-		} else if (tag instanceof Many) {
-			plugs[tag.SuperId] = {
-				isSorrounded: plugs[tag.SuperId] !== null ? plugs[tag.SuperId].isSorrounded || contain[tag.Id] !== null : contain[tag.Id],
-				isContained: plugs[tag.SuperId] !== null ? plugs[tag.SuperId].isContained || middle[tag.Id] !== null : middle[tag.Id],
-				isOpened: plugs[tag.SuperId] !== null ? plugs[tag.SuperId].isOpened || right[tag.Id] !== null : right[tag.Id] !== null,
-				isClosed: plugs[tag.SuperId] !== null ? plugs[tag.SuperId].isClosed || left[tag.Id] !== null : left[tag.Id] !== null,
-				deep: 0
-			};
-			if (contain[tag.Id] !== null) {
-				glow=true;
-				button.classList.add('active');
-			} else {
-				button.classList.remove('active');
-			}
+		let highlight = false;
+		plugs[tag.Id] = {
+			isSorrounded: contain[tag.Id] !== undefined,
+			isContained: middle[tag.Id] !== undefined,
+			isOpened: right[tag.Id] !== undefined,
+			isClosed: left[tag.Id] !== undefined,
+			deep: 0
+		};
+		if (plugs[tag.Id].isSorrounded) {
+			button.classList.add('active');
+			highlight = true;
+		} else {
+			button.classList.remove('active');
 		}
-		let doo=tag.Mime;
-		if (glow && doo) {
-			button.style["box-shadow"] = "inset #00ff00 1px 1px 50px";
+		let doo = tag.highlight;
+		if (highlight && doo) {
+			button.style["box-shadow"] = "inset " + tag.AppliedTag.value + " 1px 1px 50px";
 		} else {
 			button.style["box-shadow"] = "";
 		}
 	}
 	return plugs;
 }
+
 function addtotagi(e) {
 	$(this).parent().find('.tagi').html('');
 	var x = $(document.getSelection().anchorNode.parentNode);
@@ -204,6 +127,7 @@ function addtotagi(e) {
 		x = x.parent();
 	}
 }
+
 function Wriit(parent, cfg) {
 	let privateData = new WeakMap();
 	let props = {
@@ -384,6 +308,7 @@ function Wriit(parent, cfg) {
 	}, 1000);
 	let toolbar = new Toolbar(this);
 	Object.freeze(toolbar);
+	this.ToolBar = toolbar;
 	this.cfg.Modules.forEach(function (plugin) {
 		if (prototype[plugin].Setup !== null) {
 			prototype[plugin] = $.extend(new Module(that), prototype[plugin]);
@@ -393,11 +318,10 @@ function Wriit(parent, cfg) {
 	this.button = function (id) {
 		return that.buttons[id];
 	};
-}
+}*/
 
-for(let mod in modules){
-	installedplugins.push(mod);
-	Wriit.prototype[mod] = modules[mod];
+for (let mod in modules) {
+	core.prototype[mod] = modules[mod];
 }
 /*Wriit.prototype.pasteEvent = {
 	Setup: function () {
@@ -484,51 +408,9 @@ Wriit.prototype.strikethrough = {
 			shortcut: "ALT+SHIFT+S"
 		})), this.Insert);
 	}
-};
-/*Wriit.prototype.paragraph = {
-	Setup: function (toolbar) {
-		let fmulti = new MultiClass('paragraph', "p");
-		fmulti.Add('left', 'text-left', {
-			tooltip: "Align Left",
-			displayclass: "fa fa-align-left",
-			shortcut: "CMD+SHIFT+L"
-		});
-		fmulti.Add('center', 'text-center', {
-			tooltip: "Align Center",
-			displayclass: "fa fa-align-center",
-			shortcut: "CMD+SHIFT+C"
-		});
-		fmulti.Add('right', 'text-right', {
-			tooltip: "Align Right",
-			displayclass: "fa fa-align-right",
-			shortcut: "CMD+SHIFT+R"
-		});
-		fmulti.Add('justify', 'text-justify', {
-			tooltip: "Justify",
-			displayclass: "fa fa-align-justify",
-			shortcut: "CMD+SHIFT+J"
-		});
-		toolbar.AddButton(fmulti);
-		this.Callback(fmulti, this.Insert);
-	}
-};* /
-Wriit.prototype.forecolor = {
-	Setup: function (toolbar) {
-		let tag = new StyleTag('forecolor');
-		let prop = tag.newProperty("color");
-		tag.Add(prop.KeyValue('#FF0000','red') );
-		
-		let fmulti = new StyleAttr('forecolor', "span", c);
-		fmulti.Add('red', c.apply('#00FF00'), {
-			displayclass: "fa fa-font"
-		},true);
-		toolbar.AddButton(fmulti);
-		this.Callback(fmulti, this.Insert);
-	}
-};
-*/
+};*/
 $.fn.wriit = function (cfg) {
 	$(this).each(function () {
-		return new Wriit($(this), cfg);
+		return new core($(this), cfg);
 	});
 };

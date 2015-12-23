@@ -1,40 +1,63 @@
 module.exports = function (grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
+		sass: {
+			dev: {
+					options: {
+						style: 'expanded'
+					},
+					files: { // Dictionary of files
+						'dist/wriit.css': 'src/css/wriit.sass'
+					}
+				},
+				prod: {
+					options: {
+						sourcemap:'none',
+						style: 'compressed'
+					},
+					files: { // Dictionary of files
+						'dist/wriit.css': 'src/css/wriit.sass'
+					}
+				}
+		},
 		browserify: {
 			dev: {
 				options: {
 					browserifyOptions: {
 						debug: true
 					},
-					transform: [
-						["babelify"]
-					]
+					transform: [["babelify", {
+						compact: false,
+						moduleIds: false,
+						sourceMap: true,
+						//						sourceMapRelative:"."
+					}]]
 				},
 				files: {
 					"dist/wriit.js": [
 						"src/*.js",
 						"src/modules/*.js",
+						"src/modules/private/*.js",
 						"src/tags/*.js",
 						"src/attributes/*.js"
 					]
 				}
 			},
-			dist: {
+			prod: {
 				options: {
 					transform: [
-                  ["babelify", {
-							compact: false,
-							modules: "amd",
+						["babelify", {
+							compact: true,
 							moduleIds: true,
-							sourceMap: true
-                  }]
-               ]
+							sourceMap: false,
+						}]
+					]
 				},
 				files: {
 					"dist/wriit.js": [
 						"src/*.js",
 						"src/modules/*.js",
+						"src/modules/private/*.js",
 						"src/tags/*.js",
 						"src/attributes/*.js"
 					]
@@ -46,8 +69,11 @@ module.exports = function (grunt) {
 				'Gruntfile.js',
 				"src/*.js",
 				"src/modules/*.js",
+				"src/modules/private/*.js",
 				"src/tags/*.js",
-				"src/attributes/*.js"
+				"src/attributes/*.js",
+				"src/utils/*.js",
+				"!src/**/index.js"
 			],
 			options: {
 				"validthis": true,
@@ -58,22 +84,55 @@ module.exports = function (grunt) {
 			}
 		},
 		watch: {
-			files: ['<%= jshint.files %>'],
-			tasks: ['jshint', 'browserify:dev']
+			files: ['<%= jshint.files %>', "src/css/wriit.sass", "live.html"],
+			tasks: ['clean:live', 'execute', 'jshint', 'browserify:dev', 'sass:dev'],
+			options: {
+				livereload: {
+					host: 'localhost',
+					port: 62626
+				}
+			}
 		},
 		clean: {
-			build: ["tmp"],
+			live: ["dist/wriit.*"],
 			release: ["dist"]
 		},
+		execute: {
+			target: {
+				src: ['makeindexes.js']
+			}
+		},
+		shell: {
+			chrome: {
+				command: 'open -a "Google Chrome" dist/live.html',
+				options: {
+					async: false
+				}
+			}
+		},
+		copy: {
+			main: {
+				files: [
+					{
+						expand: true,
+						src: ['live.html'],
+						dest: 'dist/',
+						filter: 'isFile',
+						flatten: true
+					}
+				]
+			}
+		}
 	});
-
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-babel');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks("grunt-browserify");
-	//grunt.registerTask('build', ['clean:build', 'browserify:dev']);
-	//grunt.registerTask('prod', ['clean:release', 'babel:prod']);
-	grunt.registerTask('dev', ['jshint', 'clean:release', 'browserify:dev', 'watch']);
+	grunt.loadNpmTasks("grunt-execute");
+	grunt.loadNpmTasks("grunt-contrib-copy");
+	grunt.loadNpmTasks("grunt-contrib-sass");
+	grunt.loadNpmTasks("grunt-shell-spawn");
+	grunt.registerTask('build-dev', ['execute', 'jshint', 'clean:release', 'copy', 'browserify:dev', 'sass:dev', ]);
+	grunt.registerTask('build-prod', ['execute', 'jshint', 'clean:release', 'copy', 'browserify:prod', 'sass:prod', ]);
+	grunt.registerTask('serve', ['execute', 'jshint', 'clean:release', 'copy', 'browserify:dev', 'sass:dev', 'shell:chrome', 'watch']);
 };
